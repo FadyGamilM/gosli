@@ -21,10 +21,11 @@ const (
 	// for example : (define (add x) (+ x x))  {define} here is a reserved keyword
 	ReservedKeyworkdToken
 
-	// (+ 5 6) 5 or 6 are operands
+	// (+ 5 6) 5 and 6 are operands
+	// (+ x y) x and y are opearnds too if they are prev defined
 	OperandToken
 
-	// represents the data types such as int, float, ...
+	// represents the data types such as {list}
 	DataTypeToken
 
 	// represents operators
