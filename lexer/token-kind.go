@@ -4,13 +4,25 @@ package lexer
 type TokenKind uint
 
 const (
+
 	// represents the variable names
-	// for example : let {count} = 5, the count is an identifier token
+	// for example : (define (add x) (+ x x))
+	// {add} here is an idetifier
+	// {+} here is an idetifier
 	IdentifierToken TokenKind = iota
 
+	// (
+	OpeningParenthesis
+
+	// )
+	ClosedParenthesis
+
 	// represents the reserved keywords in the language
-	// for example : for, if, var, const, return, break, continue ....
+	// for example : (define (add x) (+ x x))  {define} here is a reserved keyword
 	ReservedKeyworkdToken
+
+	// (+ 5 6) 5 or 6 are operands
+	OperandToken
 
 	// represents the data types such as int, float, ...
 	DataTypeToken
@@ -20,7 +32,7 @@ const (
 	OperatorToken
 
 	// represents the values assigned to variables
-	// for example : var username = "fady gamil", the "fady gamil" is specified as a Literal token
+	// for example : (display "Enter two numbers: ") {display} is a literal string
 	LiteralToken
 
 	// represnet a comment
