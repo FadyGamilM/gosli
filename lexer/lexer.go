@@ -79,9 +79,15 @@ func IsOperator(val rune) bool {
 
 func LexOpenParenthesis(inp []rune, cursor int) (int, *Token) {
 	if inp[cursor] == '(' || inp[cursor] == ')' {
+		var kind TokenKind
+		if inp[cursor] == '(' {
+			kind = OpeningParenthesis
+		}else {
+			kind = ClosedParenthesis
+		}
 		// log.Printf("[Lex-Open-Parenthesis] ➜\tThe value at cursor = {%v} is {%v}", cursor, inp[cursor])
 		token := &Token{
-			Kind: OpeningParenthesis,
+			Kind: kind,
 			Val:  string(inp[cursor]),
 		}
 		cursor++

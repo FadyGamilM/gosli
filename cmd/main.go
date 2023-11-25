@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	tokens, err := lexer.Lex([]rune("(+ 5 6)"))
+	tokens, err := lexer.Lex([]rune("(+ 13 (- 12 1))"))
 	if err != nil {
 		log.Println("error ➜ ", err)
 	}
