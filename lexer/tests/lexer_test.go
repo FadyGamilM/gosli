@@ -71,3 +71,80 @@ func TestLexOperator(t *testing.T) {
 		assert.Equal(t, testCase.expectedCursor, actualCursor)
 	}
 }
+
+func TestLex(t *testing.T) {
+	testCases := []struct {
+		source         []rune
+		cursor         int
+		expectedTokens []lexer.Token
+		expectedCursor int
+	}{
+		{
+			source: []rune("(+ 5 (* 2 2))"),
+			cursor: 0,
+			expectedTokens: []lexer.Token{
+				lexer.Token{
+					Kind: lexer.OpeningParenthesis,
+					Val:  "(",
+				},
+				lexer.Token{
+					Kind: lexer.OperatorToken,
+					Val:  "+",
+				},
+				lexer.Token{
+					Kind: lexer.OpeningParenthesis,
+					Val:  "(",
+				},
+				lexer.Token{
+					Kind: lexer.OperatorToken,
+					Val:  "*",
+				},
+				lexer.Token{
+					Kind: lexer.OperandToken,
+					Val:  "2",
+				},
+				lexer.Token{
+					Kind: lexer.OperandToken,
+					Val:  "2",
+				},
+				lexer.Token{
+					Kind: lexer.ClosedParenthesis,
+					Val:  ")",
+				},
+				lexer.Token{
+					Kind: lexer.ClosedParenthesis,
+					Val:  ")",
+				},
+			},
+			expectedCursor: 13,
+		},
+	}
+
+	for _, testCase := range testCases {
+		tokens, err := lexer.Lex(testCase.source)
+		assert.NoError(t, err)
+		assert.Equal(t, len(testCase.expectedTokens), len(tokens))
+		t.Logf("the tokens are ➜ %v", tokens)
+	}
+}
+
+func TestLexOpenParenthesis(t *testing.T) {
+	testCases := []struct {
+		source         []rune
+		cursor         int
+		expectedToken  string
+		expectedCursor int
+	}{
+		{
+			source:         []rune("(+ 5 3)"),
+			cursor:         0,
+			expectedToken:  "(",
+			expectedCursor: 1,
+		},
+	}
+	for _, testCase := range testCases {
+		actualCursor, actualToken := lexer.LexOpenParenthesis(testCase.source, testCase.cursor)
+		assert.Equal(t, testCase.expectedCursor, actualCursor)
+		assert.Equal(t, testCase.expectedToken, actualToken.Val)
+	}
+}

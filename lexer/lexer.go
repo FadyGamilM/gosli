@@ -8,9 +8,13 @@ import (
 func Lex(inp []rune) ([]Token, error) {
 	tokens := make([]Token, 0)
 
+	i := 0
 	cursor := 0
 
 	for cursor < len(inp) {
+		log.Printf("➜ Iteration No.{%v}, the value of cursor is {%v}\n", i, cursor)
+		i++
+
 		// drop all white spaces untill we hit something, so we start discover it
 		cursor = dropWhiteSpaces(inp, cursor)
 		// if the cursor = length of the soruce, so we have a white space line of code and our cursor is at the end
@@ -20,20 +24,35 @@ func Lex(inp []rune) ([]Token, error) {
 		}
 
 		// check if its a open/closed paraenthesis > if its, continue
-		cursor, lexedToken := LexOpenParenthesis(inp, cursor)
+		var lexedToken *Token
+		cursor, lexedToken = LexOpenParenthesis(inp, cursor)
 		if lexedToken != nil {
 			tokens = append(tokens, *lexedToken)
+			// if we have a space after this token, we should go back and ignore it first by increasing our cursor
+			continue
 		}
 
+		log.Println("cursor is =====> ", cursor)
 		// check if its an operator (+, -, *, /)
 		cursor, lexedToken = LexOperator(inp, cursor)
 		if lexedToken != nil {
 			tokens = append(tokens, *lexedToken)
+			// if we have a space after this token, we should go back and ignore it first by increasing our cursor
+			continue
+		}
+
+		cursor, lexedToken = LexOperands(inp, cursor)
+		if lexedToken != nil {
+			tokens = append(tokens, *lexedToken)
+			// if we have a space after this token, we should go back and ignore it first by increasing our cursor
+			continue
 		}
 
 		_, lexedToken = LexReservedKeywords(inp, cursor)
 		if lexedToken != nil {
 			tokens = append(tokens, *lexedToken)
+			// if we have a space after this token, we should go back and ignore it first by increasing our cursor
+			continue
 		}
 	}
 
@@ -59,12 +78,14 @@ func IsOperator(val rune) bool {
 }
 
 func LexOpenParenthesis(inp []rune, cursor int) (int, *Token) {
-	if string(inp[cursor]) == "(" || string(inp[cursor]) == ")" {
-		cursor++
-		return cursor, &Token{
+	if inp[cursor] == '(' || inp[cursor] == ')' {
+		// log.Printf("[Lex-Open-Parenthesis] ➜\tThe value at cursor = {%v} is {%v}", cursor, inp[cursor])
+		token := &Token{
 			Kind: OpeningParenthesis,
-			Val:  string(inp[cursor-1]),
+			Val:  string(inp[cursor]),
 		}
+		cursor++
+		return cursor, token
 	}
 	return cursor, nil
 }
@@ -81,10 +102,12 @@ func isWhiteSpace(r rune) bool {
 func dropWhiteSpaces(inp []rune, cursor int) int {
 	for cursor < len(inp) {
 		if isWhiteSpace(inp[cursor]) {
+			// log.Printf("➜ found a white space when cursor = {%v}\n", cursor)
 			cursor++
 			continue
 		}
 
+		// log.Printf("➜ going to break, found no white space when cursor = {%v}\n", cursor)
 		// we hit something so lets go back to lex() to classify it
 		break
 	}
@@ -106,12 +129,12 @@ func LexOperands(inp []rune, cursor int) (int, *Token) {
 			tokenVal = append(tokenVal, inp[cursor])
 			// move the cursor one rune
 			cursor++
-			// continue to the next iteration
 			continue
 		}
 
 		break
 	}
+
 	if len(tokenVal) == 0 {
 		return cursor, nil
 	}
